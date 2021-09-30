@@ -87,7 +87,8 @@ Components:
 
 - FileBrowser: a container component
   - Breadcrumbs: a generic list of elements with a separator in between
-  - DataGrid: a generic sortable table
+  - DataGrid: a generic sortable/searchable table. "Search" will update the
+    table contents as the user types.
 
 Breadcrumbs Mockup:
 
@@ -96,6 +97,8 @@ Breadcrumbs Mockup:
 DataGrid Mockup:
 
 <img src="./assets/DataGrid.png" />
+<img src="./assets/DataGrid-search-name.png" />
+<img src="./assets/DataGrid-search-size.png" />
 
 
 ## Security Considerations
