@@ -21,6 +21,15 @@ consisting of:
 
 [xdszuh]: https://github.com/gravitational/careers/blob/18be4e4073ad42f713691d4b11e2a971b84e1ad2/challenges/frontend/challenge.md
 
+I'll also be including unit tests for both projects. Those will employ these
+development dependencies:
+
+- [mocha][hxxpec]: test runner
+- [chai][ydmgmg]: assertion library
+
+[hxxpec]: https://mochajs.org/
+[ydmgmg]: https://www.chaijs.com/
+
 
 Client
 ======
@@ -123,15 +132,6 @@ Server
 
 [kcrhfw]: https://expressjs.com/
 [cfwcpu]: https://www.npmjs.com/package/argon2
-
-I'll also be including unit tests. Those will employ these development
-dependencies:
-
-- [mocha][hxxpec]: test runner
-- [chai][ydmgmg]: assertion library
-
-[hxxpec]: https://mochajs.org/
-[ydmgmg]: https://www.chaijs.com/
 
 
 ## Endpoints
