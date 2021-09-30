@@ -28,16 +28,22 @@ Client
 ## Dependencies
 
 - React: required by the challenge (but I'd probably use it anyway)
-- Redux: not strictly required, but I like its reducer pattern and I think the
-  Redux DevTools extension is helpful in development
 
 Components will be implemented with JSX.
 
 ## Routes
 
+### Header
+
+Present on all routes. If the user is authenticated, will display a "Log out"
+button. "Log out" will call `POST /api/logout` to expire the session on the
+server, clear `Session-Id` from `localStorage`, then redirect to
+`/logout`.
+
 ### `/`
 
-Since this is a basic demo app, `/` will redirect to `/login`.
+Since this is a basic demo app, `/` will redirect to `/filebrowser/` (which will
+redirect to `/login` if unauthenticated).
 
 ### `/login`
 
@@ -48,6 +54,15 @@ Components:
 
 <img src="./assets/Login.png" />
 <img src="./assets/Login-error.png" />
+
+### `/logout`
+
+Components:
+
+- Logout: Basic logout success message with a link back to `/login`
+
+<img src="./assets/Logout.png" />
+
 
 ### `/filebrowser/:filepath`
 
@@ -65,21 +80,22 @@ DataGrid Mockup:
 
 <img src="./assets/DataGrid.png" />
 
+
 ## Security Considerations
 
 ### Auth
 
-Authentication and authorization will be handled using a bearer access token
-gotten from the server's `/login` endpoint. The access token will be stored in
-the browser's `localStorage` and passed in authenticated requests using the
-`Authorization` HTTP header.
+Authentication and authorization will be handled using a session ID gotten from
+the server's `/login` endpoint. The session ID will be stored in the browser's
+`localStorage` and passed in authenticated requests using a `Session-Id` HTTP
+header.
 
 ### CSRF (Cross-site request forgery)
 
 CSRF attacks are not a concern for two reasons:
 
 - There are no HTTP requests with side-effects, i.e. the server is stateless.
-- Auth is handled manually with the `Authorization` header, rather than
+- Auth is handled manually with the `Session-Id` header, rather than
   automatically with a cookie.
 
 ### XSS (Cross-site scripting)
@@ -104,13 +120,9 @@ Server
   the node `http2.createServer` API.
 - [argon2][cfwcpu]: implementation of OWASP's currently recommended password
   hashing function
-- [jsonwebtoken][qdhapb]: library for creating/verifying JSON Web Tokens for
-  user auth. JWTs are somewhat controversial so I'll attempt to give some rationale
-  in the "Auth" section below.
 
 [kcrhfw]: https://expressjs.com/
 [cfwcpu]: https://www.npmjs.com/package/argon2
-[qdhapb]: https://www.npmjs.com/package/jsonwebtoken
 
 I'll also be including unit tests. Those will employ these development
 dependencies:
@@ -126,9 +138,14 @@ dependencies:
 
 ### `POST /api/login`
 
+Creates a session, returning the session ID.
+
 Request
 
 ```
+POST /api/login HTTP/2
+content-type: application/json
+
 {
   "username": "zach",
   "password": "hunter2"
@@ -138,16 +155,23 @@ Request
 Response
 
 ```
+HTTP/2 200 OK
+content-type: application/json
+
 {
-  "token": "eyJhbGciOiJFUzI1NiIsIn..."
+  "sessionId": "<random session id>"
 }
 ```
 
 Error
 
 ```
+HTTP/2 500 Internal Server Error
+content-type: application/json
+
 {
-  "code": "${errorCode}"
+  "code": "${errorCode}",
+  "message": "${User friendly error message}"
 }
 ```
 
@@ -157,20 +181,71 @@ Error
   incorrect
 
 
-### `GET /api/filebrowser/:filepath`
+### `POST /api/logout`
+
+Expires the session associated with the given `Session-Id`.
 
 Request Headers
 
-- `Authorization` (required): `Bearer ${token}`, where `token` is the value
-  received from a previous invocation of `POST /api/login`
+- `Session-Id` (string, required): the value received from a previous
+  invocation of `POST /api/login`
 
-Parameters
+Request
 
-- `filepath`: a `/`-separated absolute file path
+```
+POST /api/login HTTP/2
+content-type: application/json
+
+{
+  "username": "zach",
+  "password": "hunter2"
+}
+```
 
 Response
 
 ```
+HTTP/2 200 OK
+```
+
+Error
+
+```
+HTTP/2 ${status} Status Message
+content-type: application/json
+
+{
+  "code": "${errorCode}",
+  "message": "${User friendly error message}"
+}
+```
+
+Possible errors:
+
+| `status` | `errorCode` | Description |
+| --- | --- | --- |
+| 401 | `"auth/sessionExpired"` | The Session-Id used in the request has expired.
+| 401 | `"auth/sessionInvalid"` | The Session-Id used in the request is invalid.
+
+
+### `GET /api/filebrowser/:filepath`
+
+Request Headers
+
+- `Session-Id` (string, required): the value received from a previous
+  invocation of `POST /api/login`
+
+Parameters
+
+- `filepath` (string, optional): a `/`-separated absolute file path. Defaults
+  to `"/"`.
+
+Response
+
+```
+HTTP/2 200 OK
+content-type: application/json
+
 [
   {
     name: "teleport.go",
@@ -188,16 +263,23 @@ Response
 Error
 
 ```
+HTTP/2 ${status} Status Message
+content-type: application/json
+
 {
-  "code": "${errorCode}"
+  "code": "${errorCode}",
+  "message": "${User friendly error message}"
 }
 ```
 
-`errorCode` can be:
+Possible errors:
 
-- `"filebrowser/noEntry"`: the supplied `filepath` does not exist.
-- `"auth/tokenExpired"`: The access token used in the request has expired.
-- `"auth/tokenInvalid"`: The access token used in the request is invalid.
+| `status` | `errorCode` | Description |
+| --- | --- | --- |
+| 401 | `"auth/sessionExpired"` | The Session-Id used in the request has expired.
+| 401 | `"auth/sessionInvalid"` | The Session-Id used in the request is invalid.
+| 403 | `"auth/notAuthorized"` | The user is not authorized to make this request (requires the `read:filebrowser` permission).
+| 500 | `"filebrowser/noEntry"` | The supplied `filepath` does not exist.
 
 
 ### `GET /*`
@@ -258,19 +340,38 @@ Passwords will be hashed as follows:
 
 ### Auth
 
-Authentication and authorization will be performed using JWTs (JSON Web Tokens)
-with a 1-hour expiration. In development mode a keypair will be generated for
-JWT signing.
+Authentication and authorization will be handled using sessions. Sessions will
+be stored in memory in a data structure with the following shape:
 
-> Why JWTs? (tl;dr: my general desire to avoid state when possible) JWTs are a
-  massively popular technique, so there's a fair bit of skepticism around their
-  use. They may seem like overkill as a default choice given that their main
-  use case is to enable verification of user auth in a microservices
-  environment, i.e. without a central server/database. I'm choosing to use
-  them here because they eliminate state that would otherwise need to be
-  tracked/pruned: a list of active sessions. My goal is to have slightly less
-  cognitive overhead and a lower chance of introducing state-related bugs.
-  That's the theory anyhow.
+```typescript
+type SessionId = string;
+
+type Session = {
+  id: SessionId;
+  username: string;
+  scopes: string[];
+  lastActivityDate: Date;
+  expirationDate: Date;
+};
+
+type SessionStore = Map<SessionId, Session>;
+```
+
+In a bit more detail:
+
+- `id`: a 128-bit session ID. Randomly generated by a CSPRNG (cryptographically
+  secure pseudorandom number generator), in node.js' case this will be
+  `crypto.randomBytes`.
+- `username`: the username of the authenticated user associated with this session
+- `scopes`: a list of permissions for user access control. This application
+  will only have one scope: `read:filebrowser`.
+- `lastActivityDate`: timestamp of the last request which used this session ID.
+  Used to implement an idle timeout. Idle timeout will be set at 30 minutes.
+- `expirationDate`: timestamp used to implement an absolute session timeout.
+  For this application I'll choose an absolute timeout of `${session creation
+  time} + 8 hours`.
+
+Sessions will be created as part of the `/api/login` endpoint.
 
 
 Omissions
