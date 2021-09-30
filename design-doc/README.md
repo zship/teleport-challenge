@@ -152,6 +152,11 @@ content-type: application/json
 }
 ```
 
+JSON Parameters:
+
+- `username` (string, required)
+- `password` (string, required)
+
 Response
 
 ```
