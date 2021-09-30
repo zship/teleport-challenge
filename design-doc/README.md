@@ -193,13 +193,7 @@ Request Headers
 Request
 
 ```
-POST /api/login HTTP/2
-content-type: application/json
-
-{
-  "username": "zach",
-  "password": "hunter2"
-}
+POST /api/logout HTTP/2
 ```
 
 Response
