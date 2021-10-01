@@ -109,8 +109,8 @@ DataGrid Mockup:
 > parseable, it will need some escaping. For example, components should not
 > contain a `'?'` character since that would be interpreted as a query string
 > by a URL parser. To accomplish this, each path component (`/`-delimited) will
-> be URL-encoded. For example,`'/path/to/file?.txt'` becomes
-> `'/path/to/file%3F.txt'`.
+> be URL-encoded. For example,`'path/to/file?.txt'` becomes
+> `'path/to/file%3F.txt'`.
 
 
 ## Security Considerations
@@ -253,16 +253,21 @@ Request Headers
 
 Parameters
 
-- `filepath` (string, optional): a `/`-separated absolute file path. It should
-  be URL-encoded, e.g. `'/path/to/file?.txt'` becomes
-  `'%2Fpath%2Fto%2Ffile%3F.txt'`. Defaults to `"/"`.
+- `filepath` (string, optional): a `/`-separated relative file path. It should
+  be URL-encoded, e.g. `'path/to/file?.txt'` becomes
+  `'path%2Fto%2Ffile%3F.txt'`. Defaults to `"."`.
 
-> Note: In this challenge, `filepath` is resolved against a fake FS specified
-> in a JSON file. So there isn't a danger in having multiple relative
-> `'../../..'` paths inside `filepath`. If this were resolved against a real
-> filesystem, however, we'd need to first normalize `filepath` (node
-> `path.normalize()`) and then check that the normalized `filepath` lies inside
-> a directory to which the user has access.
+Files will be rooted in a directory specified by the `$FILEBROWSER_ROOT`
+environment variable. Care needs to be taken to prevent users "breaking out" of
+this directory (e.g. using `'../../outside/dir'`). I'll use this procedure:
+
+1. Calculate `absoluteFilepath` using `path.join(FILEBROWSER_ROOT, filepath)`.
+   Normalize this path (resolving `'..'` segments and removing duplicate
+   sequential path separators) using `path.normalize()`.
+2. Calculate `relativeFilepath`, which will be the value of `absoluteFilepath` relative
+   to `$FILEBROWSER_ROOT` (node `path.relative(FILEBROWSER_ROOT, absoluteFilepath)`).
+3. Check `relativeFilepath` for a leading `'..'`. If present, throw the
+   `"filebrowser/noEntry"` error.
 
 Response
 
