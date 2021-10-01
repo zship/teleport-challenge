@@ -105,6 +105,13 @@ DataGrid Mockup:
 <img src="./assets/DataGrid-search-name.png" />
 <img src="./assets/DataGrid-search-size.png" />
 
+> Note: `filepath` will be parsed out of `window.location`. To be robustly
+> parseable, it will need some escaping. For example, components should not
+> contain a `'?'` character since that would be interpreted as a query string
+> by a URL parser. To accomplish this, each path component (`/`-delimited) will
+> be URL-encoded. For example,`'/path/to/file?.txt'` becomes
+> `'/path/to/file%3F.txt'`.
+
 
 ## Security Considerations
 
@@ -246,8 +253,16 @@ Request Headers
 
 Parameters
 
-- `filepath` (string, optional): a `/`-separated absolute file path. Defaults
-  to `"/"`.
+- `filepath` (string, optional): a `/`-separated absolute file path. It should
+  be URL-encoded, e.g. `'/path/to/file?.txt'` becomes
+  `'%2Fpath%2Fto%2Ffile%3F.txt'`. Defaults to `"/"`.
+
+> Note: In this challenge, `filepath` is resolved against a fake FS specified
+> in a JSON file. So there isn't a danger in having multiple relative
+> `'../../..'` paths inside `filepath`. If this were resolved against a real
+> filesystem, however, we'd need to first normalize `filepath` (node
+> `path.normalize()`) and then check that the normalized `filepath` lies inside
+> a directory to which the user has access.
 
 Response
 
