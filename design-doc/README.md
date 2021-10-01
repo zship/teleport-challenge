@@ -66,11 +66,11 @@ Components:
 
 Props:
 
-- `redirect`: a URL to which the user will be redirected after a successful
-  login. This is to support bookmarking authenticated paths. Intended to be
-  passed in from the router, extracted from a `window.location` that looks
-  like: `/login?redirect=<url-encoded-path>`, e.g.
-  `/login?redirect=%2Ffilebrowser%2Fteleport%2Flib`.
+- `redirect`: an app-relative path (i.e. starting with `/`) to which the user
+  will be redirected after a successful login. This is to support bookmarking
+  authenticated paths. Intended to be passed in from the router, extracted from
+  a `window.location` that looks like: `/login?redirect=<url-encoded-path>`,
+  e.g. `/login?redirect=%2Ffilebrowser%2Fteleport%2Flib`.
 
 > Note: `redirect` must reside on the same domain in order to prevent an
 > unvalidated redirect. An easy way to accomplish this would be to make sure
