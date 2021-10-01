@@ -72,6 +72,11 @@ Props:
   like: `/login?redirect=<url-encoded-path>`, e.g.
   `/login?redirect=%2Ffilebrowser%2Fteleport%2Flib`.
 
+> Note: `redirect` must reside on the same domain in order to prevent an
+> unvalidated redirect. An easy way to accomplish this would be to make sure
+> `redirect` is *not* a valid URL, i.e. `new URL(redirect)` throws an
+> Error.
+
 ### `/logout`
 
 Components:
@@ -112,11 +117,8 @@ header.
 
 ### CSRF (Cross-site request forgery)
 
-CSRF attacks are not a concern for two reasons:
-
-- There are no HTTP requests with side-effects, i.e. the server is stateless.
-- Auth is handled manually with the `Session-Id` header, rather than
-  automatically with a cookie.
+CSRF attacks are not a concern because auth is handled manually with the
+`Session-Id` header, rather than automatically with a cookie.
 
 ### XSS (Cross-site scripting)
 
@@ -138,11 +140,8 @@ Server
 - [express][kcrhfw]: It's the most popular HTTP server framework (last I
   checked) and I figure it'll cut down on some noise vs. coding directly against
   the node `http2.createServer` API.
-- [argon2][cfwcpu]: implementation of OWASP's currently recommended password
-  hashing function
 
 [kcrhfw]: https://expressjs.com/
-[cfwcpu]: https://www.npmjs.com/package/argon2
 
 
 ## Endpoints
@@ -331,21 +330,15 @@ User accounts will be stored in a JSON file with the following structure:
 
 Passwords will be hashed as follows:
 
-1. The plaintext password will be hashed using SHA512. [This is a technique
-   used by Dropbox to help defend against DoS attacks.][atpftb]
-2. A random salt will be generated per-user. Length will be 128 bits (arbitrary
+1. A random salt will be generated per-user. Length will be 128 bits (arbitrary
    choice; in a real application an optimal salt length could be computed using
    a [birthday problem approximation][jwgsnw]).
-3. The SHA512 hash will be hashed again using **argon2id** with the random salt
-   and parameters `m=37 MiB, t=1, p=1`, per current [OWASP
+2. The plaintext password will be hashed using **scrypt** with the salt and
+   parameters `N=2^14 (16 MiB), r=8 (1024 bytes), p=4`, per current [OWASP
    recommendations][cjcbmz].
-4. The resulting argon2id hash will be encrypted with an AES256
-   [pepper][svzrcp].
 
-[atpftb]: https://dropbox.tech/security/how-dropbox-securely-stores-your-passwords
 [jwgsnw]: https://en.wikipedia.org/wiki/Birthday_problem#Probability_table
-[cjcbmz]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
-[svzrcp]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#peppering
+[cjcbmz]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#scrypt
 
 
 ### Auth
