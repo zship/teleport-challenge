@@ -1,4 +1,3 @@
-import http2 from 'http2';
 import fs from 'fs';
 import path from 'path';
 import express from 'express';
