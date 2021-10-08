@@ -13,11 +13,12 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "server/*": "./src/*"
+      "server/*": ["./src/*"]
     }
   },
   "include": [
-    "./src/*",
+    "./src/**/*",
+    "./scripts/**/*",
     "./*.ts"
   ]
 }

@@ -38,3 +38,9 @@ teleport-challenge server
 ```
 $ yarn run start
 ```
+
+## Unit tests
+
+```
+$ yarn run tests
+```

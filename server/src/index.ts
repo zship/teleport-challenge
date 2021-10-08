@@ -1,7 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import express from 'express';
+import { ErrorRequestHandler } from 'express';
 import spdy from 'spdy';
+
+import { handlePostLogin } from 'server/route/login/post';
+import { isErrorWithCode } from './lib/error';
+import { handleGetFilebrowser } from './route/filebrowser/get';
 
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -16,17 +21,15 @@ clientPath = path.resolve(projectRoot, clientPath);
 
 const app = express();
 
-app.post('/api/login', (req, res) => {
-  res.status(200).send('stub');
-});
+app.use(express.json());
+
+app.post('/api/login', handlePostLogin);
 
 app.post('/api/logout', (req, res) => {
   res.status(200).send('stub');
 });
 
-app.get('/api/filebrowser', (req, res) => {
-  res.status(200).send('stub');
-});
+app.get('/api/filebrowser', handleGetFilebrowser);
 
 // fallback route for paths starting in '/api'
 app.use('/api', (req, res) => {
@@ -41,6 +44,25 @@ app.use((req, res, next) => {
   req.url = '/index.html';
   express.static(clientPath)(req, res, next);
 });
+
+const jsonErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  if (isErrorWithCode(err)) {
+    res.status(err.statusCode);
+    res.json(err);
+    return;
+  }
+  if (err instanceof Error) {
+    res.status(500);
+    res.json({
+      message: err.message,
+      stack: err.stack,
+    });
+    return;
+  }
+  next(err);
+};
+
+app.use(jsonErrorHandler);
 
 spdy
   .createServer(
