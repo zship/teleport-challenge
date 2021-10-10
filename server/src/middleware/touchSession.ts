@@ -1,12 +1,7 @@
 import { RequestHandler } from 'express-serve-static-core';
 import { ErrorWithCode, newError } from 'server/lib/error';
-import { Session } from 'server/model/session';
+import { MAX_IDLE_TIME, MAX_SESSION_TIME, Session } from 'server/model/session';
 import * as SessionModel from 'server/model/session';
-
-// 30 minutes
-export const MAX_IDLE_TIME = 30 * 60 * 1000;
-// 8 hours
-export const MAX_SESSION_TIME = 8 * 60 * 60 * 1000;
 
 export type Action =
   | {

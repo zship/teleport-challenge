@@ -1,6 +1,6 @@
 import assert from 'assert/strict';
-import { Session } from 'server/model/session';
-import { Action, getActions, MAX_IDLE_TIME } from './touchSession';
+import { Session, MAX_IDLE_TIME } from 'server/model/session';
+import { Action, getActions } from './touchSession';
 
 describe('touchSession middleware', () => {
   it('should expire idle sessions', () => {

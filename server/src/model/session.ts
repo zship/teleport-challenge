@@ -13,6 +13,11 @@ export type Session = {
   expirationTimestamp: number;
 };
 
+// 30 minutes
+export const MAX_IDLE_TIME = 30 * 60 * 1000;
+// 8 hours
+export const MAX_SESSION_TIME = 8 * 60 * 60 * 1000;
+
 type SessionStore = Map<SessionId, Session>;
 
 const sessionStore: SessionStore = new Map();
@@ -35,7 +40,7 @@ export const create = ({
     username,
     scopes,
     lastActivityTimestamp: now,
-    expirationTimestamp: now + 8 * 60 * 60 * 1000,
+    expirationTimestamp: now + MAX_SESSION_TIME,
   };
   sessionStore.set(id, session);
   return session;
