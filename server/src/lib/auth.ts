@@ -12,6 +12,9 @@ export const getPasswordHash = ({
       password,
       salt,
       256 / 8,
+      // the below scrypt parameters are taken from current OWASP
+      // recommendations as of 2021-10-10
+      // (https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#scrypt)
       {
         N: 2 ** 14,
         r: 8,
