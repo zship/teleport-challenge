@@ -1,12 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import express from 'express';
-import { ErrorRequestHandler } from 'express';
 import spdy from 'spdy';
 
 import { handlePostLogin } from 'server/route/login/post';
-import { isErrorWithCode } from './lib/error';
 import { handleGetFilebrowser } from './route/filebrowser/get';
+import { jsonErrorHandler } from './middleware/jsonErrorHandler';
 
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -44,23 +43,6 @@ app.use((req, res, next) => {
   req.url = '/index.html';
   express.static(clientPath)(req, res, next);
 });
-
-const jsonErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  if (isErrorWithCode(err)) {
-    res.status(err.statusCode);
-    res.json(err);
-    return;
-  }
-  if (err instanceof Error) {
-    res.status(500);
-    res.json({
-      message: err.message,
-      stack: err.stack,
-    });
-    return;
-  }
-  next(err);
-};
 
 app.use(jsonErrorHandler);
 

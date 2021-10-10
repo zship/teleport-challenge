@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express-serve-static-core';
-import { ErrorWithCode, newError } from 'server/lib/error';
+import { ErrorWithCode } from 'server/lib/ErrorWithCode';
 import { MAX_IDLE_TIME, MAX_SESSION_TIME, Session } from 'server/model/session';
 import * as SessionModel from 'server/model/session';
 
@@ -26,15 +26,13 @@ export const getActions = ({
   session: Session;
   currentTimestamp: number;
 }): Action[] => {
-  const idleElapsed =
-    currentTimestamp - session.lastActivityTimestamp;
+  const idleElapsed = currentTimestamp - session.lastActivityTimestamp;
   if (idleElapsed >= MAX_IDLE_TIME) {
     return [
       { type: 'session/delete' },
       {
         type: 'error',
-        error: newError({
-          statusCode: 401,
+        error: new ErrorWithCode({
           code: 'auth/sessionExpired',
           message: 'The Session-Id used in the request has expired',
         }),
@@ -48,8 +46,7 @@ export const getActions = ({
       { type: 'session/delete' },
       {
         type: 'error',
-        error: newError({
-          statusCode: 401,
+        error: new ErrorWithCode({
           code: 'auth/sessionExpired',
           message: 'The Session-Id used in the request has expired',
         }),

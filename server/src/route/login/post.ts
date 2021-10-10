@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
 import { getPasswordHash } from 'server/lib/auth';
-import { newError } from 'server/lib/error';
+import { ErrorWithCode } from 'server/lib/ErrorWithCode';
 import * as Session from 'server/model/session';
 import * as User from 'server/model/user';
 
@@ -26,8 +26,8 @@ export const handlePostLogin: RequestHandler<
   const { username, password } = req.body;
 
   if (username === undefined || password === undefined) {
-    const err = newError({
-      code: 'login/failed',
+    const err = new ErrorWithCode({
+      code: 'login/validation/username',
       message: 'username is required',
     });
     next(err);
@@ -35,8 +35,8 @@ export const handlePostLogin: RequestHandler<
   }
 
   if (password === undefined) {
-    const err = newError({
-      code: 'login/failed',
+    const err = new ErrorWithCode({
+      code: 'login/validation/password',
       message: 'password is required',
     });
     next(err);
@@ -67,7 +67,7 @@ export const handlePostLogin: RequestHandler<
     // fake the only semi-expensive part of session creation
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const dummySessionId = randomBytes(128).toString('hex');
-    const err = newError({
+    const err = new ErrorWithCode({
       code: 'login/failed',
       message: `The user doesn't exist, or the supplied password was incorrect.`,
     });

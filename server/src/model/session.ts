@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { Request } from 'express-serve-static-core';
-import { newError } from 'server/lib/error';
+import { ErrorWithCode } from 'server/lib/ErrorWithCode';
 import { Scope } from './user';
 
 export type SessionId = string;
@@ -57,8 +57,7 @@ export const del = (sessionId: SessionId): void => {
 export const assertAuthorized = (req: Request, scopes: Scope[]): void => {
   const sessionId = req.header('session-id');
   if (sessionId === undefined) {
-    throw newError({
-      statusCode: 401,
+    throw new ErrorWithCode({
       code: 'auth/sessionInvalid',
       message: 'The Session-Id used in the request is invalid',
     });
@@ -66,8 +65,7 @@ export const assertAuthorized = (req: Request, scopes: Scope[]): void => {
 
   const session = getBySessionId(sessionId);
   if (session === undefined) {
-    throw newError({
-      statusCode: 401,
+    throw new ErrorWithCode({
       code: 'auth/sessionInvalid',
       message: 'The Session-Id used in the request is invalid',
     });
@@ -75,8 +73,7 @@ export const assertAuthorized = (req: Request, scopes: Scope[]): void => {
 
   for (const scope of scopes) {
     if (!session.scopes.includes(scope)) {
-      throw newError({
-        statusCode: 403,
+      throw new ErrorWithCode({
         code: 'auth/notAuthorized',
         message: `This request requires the "${scope}" scope`,
       });
