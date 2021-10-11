@@ -4,7 +4,9 @@ export type ErrorCode =
   | 'auth/notAuthorized'
   | 'login/failed'
   | 'login/validation/username'
-  | 'login/validation/password';
+  | 'login/validation/password'
+  | 'filebrowser/noEntry'
+  | 'filebrowser/notDirectory';
 
 class ErrorWithCode extends Error {
   code: ErrorCode;
