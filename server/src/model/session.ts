@@ -59,7 +59,7 @@ export const assertAuthorized = (req: Request, scopes: Scope[]): void => {
   if (sessionId === undefined) {
     throw new ErrorWithCode({
       code: 'auth/sessionInvalid',
-      message: 'The Session-Id used in the request is invalid',
+      message: 'This request requires authentication. Please log in and try again.',
     });
   }
 
@@ -67,7 +67,7 @@ export const assertAuthorized = (req: Request, scopes: Scope[]): void => {
   if (session === undefined) {
     throw new ErrorWithCode({
       code: 'auth/sessionInvalid',
-      message: 'The Session-Id used in the request is invalid',
+      message: 'This request requires authentication. Please log in and try again.',
     });
   }
 
@@ -75,7 +75,7 @@ export const assertAuthorized = (req: Request, scopes: Scope[]): void => {
     if (!session.scopes.includes(scope)) {
       throw new ErrorWithCode({
         code: 'auth/notAuthorized',
-        message: `This request requires the "${scope}" scope`,
+        message: `This request requires the "${scope}" scope.`,
       });
     }
   }
