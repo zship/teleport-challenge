@@ -3,6 +3,10 @@ import path from 'path';
 import express from 'express';
 import spdy from 'spdy';
 
+import { handlePostLogin } from 'server/route/login/post';
+import { handleGetFilebrowser } from './route/filebrowser/get';
+import { jsonErrorHandler } from './middleware/jsonErrorHandler';
+
 const projectRoot = path.resolve(__dirname, '..');
 
 let sslKeyPath = process.env.SSL_KEY_PATH || '.keys/server-key.pem';
@@ -16,17 +20,15 @@ clientPath = path.resolve(projectRoot, clientPath);
 
 const app = express();
 
-app.post('/api/login', (req, res) => {
-  res.status(200).send('stub');
-});
+app.use(express.json());
+
+app.post('/api/login', handlePostLogin);
 
 app.post('/api/logout', (req, res) => {
   res.status(200).send('stub');
 });
 
-app.get('/api/filebrowser', (req, res) => {
-  res.status(200).send('stub');
-});
+app.get('/api/filebrowser', handleGetFilebrowser);
 
 // fallback route for paths starting in '/api'
 app.use('/api', (req, res) => {
@@ -41,6 +43,8 @@ app.use((req, res, next) => {
   req.url = '/index.html';
   express.static(clientPath)(req, res, next);
 });
+
+app.use(jsonErrorHandler);
 
 spdy
   .createServer(
