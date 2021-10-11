@@ -25,7 +25,7 @@ export const handlePostLogin: RequestHandler<
 > = async (req, res, next) => {
   const { username, password } = req.body;
 
-  if (username === undefined || password === undefined) {
+  if (!username) {
     const err = new ErrorWithCode({
       code: 'login/validation/username',
       message: 'username is required',
@@ -34,7 +34,7 @@ export const handlePostLogin: RequestHandler<
     return;
   }
 
-  if (password === undefined) {
+  if (!password) {
     const err = new ErrorWithCode({
       code: 'login/validation/password',
       message: 'password is required',
