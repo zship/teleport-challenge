@@ -14,7 +14,11 @@ export const jsonErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof ErrorWithCode) {
     const statusCode = httpStatusCodeMap[err.code];
     res.status(statusCode);
-    res.json(err);
+    res.json({
+      code: err.code,
+      message: err.message,
+      stack: err.stack,
+    });
     return;
   }
   if (err instanceof Error) {
