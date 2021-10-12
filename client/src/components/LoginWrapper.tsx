@@ -3,7 +3,7 @@ import React, { ReactElement, useState } from 'react';
 import { login } from 'client/api/login';
 import { gotoRoute } from 'client/router/gotoRoute';
 import { useStore } from 'client/store';
-import { setSessionId } from 'client/store/actions';
+import { setSessionId } from 'client/store';
 import { Login, LoginFunction } from './Login';
 
 type URL = typeof window.URL.prototype;
