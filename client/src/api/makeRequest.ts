@@ -1,4 +1,4 @@
-import { ApiError, ErrorCode } from 'client/lib/ApiError';
+import { ApiError } from 'client/lib/ApiError';
 
 export const makeRequest = async ({
   url,
@@ -17,22 +17,11 @@ export const makeRequest = async ({
     },
   });
 
-  const json = (await response.json()) as Record<string, unknown>;
+  const json = (await response.json()) as unknown;
 
-  if (response.status >= 400) {
-    let code: ErrorCode = 'unknown';
-    if ('code' in json && typeof json.code === 'string') {
-      code = json.code as ErrorCode;
-    }
-    let message = '';
-    if ('message' in json && typeof json.message === 'string') {
-      message = json.message;
-    }
-    throw new ApiError({
-      code,
-      message,
-    });
+  if (!response.ok) {
+    throw new ApiError(json as ApiError);
   }
 
-  return json;
+  return json as Record<string, unknown>;
 };
