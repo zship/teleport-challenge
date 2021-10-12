@@ -4,19 +4,30 @@ export const makeRequest = async ({
   url,
   method,
   body,
+  headers,
 }: {
   url: string;
   method: string;
-  body: Record<string, unknown>;
-}): Promise<Record<string, unknown>> => {
-  const response = await window.fetch(url, {
+  body?: Record<string, unknown>;
+  headers?: Record<string, string>;
+}): Promise<unknown> => {
+  let opts: RequestInit = {
     method,
-    body: JSON.stringify(body),
-    headers: {
-      'content-type': 'application/json',
-    },
-  });
+    headers,
+  };
 
+  if (body !== undefined) {
+    opts = {
+      ...opts,
+      body: JSON.stringify(body),
+      headers: {
+        'content-type': 'application/json',
+        ...headers,
+      },
+    };
+  }
+
+  const response = await window.fetch(url, opts);
   const json = (await response.json()) as unknown;
 
   if (!response.ok) {

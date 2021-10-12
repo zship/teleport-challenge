@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 
-import { FileBrowser } from 'client/components/FileBrowser';
+import { FileBrowserWrapper } from 'client/components/FileBrowserWrapper';
 import { LoginWrapper } from 'client/components/LoginWrapper';
 import { useStore } from 'client/store';
 import { gotoRoute } from './gotoRoute';
@@ -30,7 +30,7 @@ export const Router = ({ url }: { url: URL }): ReactElement => {
   }
 
   if (path.startsWith('/filebrowser')) {
-    return <FileBrowser />;
+    return <FileBrowserWrapper url={url} />;
   }
 
   return <div>404</div>;
