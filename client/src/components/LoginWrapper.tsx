@@ -11,16 +11,6 @@ type LoadingState = 'unsent' | 'loading' | 'done' | 'error';
 
 const DEFAULT_REDIRECT = '/filebrowser';
 
-const isValidUrl = (input: string): boolean => {
-  try {
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    const url = new window.URL(input);
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
-
 const getRedirectPath = (url: URL): string => {
   let redirect = url.searchParams.get('redirect');
   if (redirect === null) {
@@ -30,7 +20,7 @@ const getRedirectPath = (url: URL): string => {
   // Prevent unvalidated redirects by not allowing `redirect` to be a full URL
   // (e.g. "http://google.com"). Instead `redirect` must be an app-relative
   // path (e.g. "/filebrowser").
-  if (isValidUrl(redirect)) {
+  if (!redirect.startsWith('/')) {
     return DEFAULT_REDIRECT;
   }
   return redirect;
