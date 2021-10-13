@@ -28,11 +28,16 @@ export const makeRequest = async ({
   }
 
   const response = await window.fetch(url, opts);
-  const json = (await response.json()) as unknown;
 
+  const text = await response.text();
+  if (!text) {
+    // the server only sends empty responses on success
+    return;
+  }
+
+  const json = JSON.parse(text) as unknown;
   if (!response.ok) {
     throw new ApiError(json as ApiError);
   }
-
-  return json as Record<string, unknown>;
+  return json;
 };
