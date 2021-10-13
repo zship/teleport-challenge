@@ -6,6 +6,7 @@ import spdy from 'spdy';
 import { handlePostLogin } from 'server/route/login/post';
 import { handleGetFilebrowser } from './route/filebrowser/get';
 import { jsonErrorHandler } from './middleware/jsonErrorHandler';
+import { handlePostLogout } from './route/logout/post';
 
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -24,9 +25,7 @@ app.use(express.json());
 
 app.post('/api/login', handlePostLogin);
 
-app.post('/api/logout', (req, res) => {
-  res.status(200).send('stub');
-});
+app.post('/api/logout', handlePostLogout);
 
 app.get('/api/filebrowser', handleGetFilebrowser);
 
