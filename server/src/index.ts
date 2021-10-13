@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import express from 'express';
 import spdy from 'spdy';
 
@@ -8,16 +7,8 @@ import { handleGetFilebrowser } from './route/filebrowser/get';
 import { jsonErrorHandler } from './middleware/jsonErrorHandler';
 import { handlePostLogout } from './route/logout/post';
 
-const projectRoot = path.resolve(__dirname, '..');
-
-let sslKeyPath = process.env.SSL_KEY_PATH || '.keys/server-key.pem';
-let sslCertPath = process.env.SSL_CERT_PATH || '.keys/server-cert.pem';
-let clientPath = process.env.CLIENT_PATH || '../client/build';
-const port = process.env.PORT || 8443;
-
-sslKeyPath = path.resolve(projectRoot, sslKeyPath);
-sslCertPath = path.resolve(projectRoot, sslCertPath);
-clientPath = path.resolve(projectRoot, clientPath);
+import { config } from 'server/config';
+const { port, sslKeyPath, sslCertPath, clientPath } = config;
 
 const app = express();
 
@@ -27,7 +18,7 @@ app.post('/api/login', handlePostLogin);
 
 app.post('/api/logout', handlePostLogout);
 
-app.get('/api/filebrowser', handleGetFilebrowser);
+app.get('/api/filebrowser/?*', handleGetFilebrowser);
 
 // fallback route for paths starting in '/api'
 app.use('/api', (req, res) => {

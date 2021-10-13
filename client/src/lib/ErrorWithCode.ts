@@ -1,12 +1,4 @@
-export type ErrorCode =
-  | 'auth/sessionInvalid'
-  | 'auth/sessionExpired'
-  | 'auth/notAuthorized'
-  | 'login/failed'
-  | 'login/validation/username'
-  | 'login/validation/password'
-  | 'filebrowser/noEntry'
-  | 'filebrowser/notDirectory';
+export type ErrorCode = 'api/unexpectedResponse';
 
 class ErrorWithCode extends Error {
   code: ErrorCode;

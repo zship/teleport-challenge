@@ -1,14 +1,9 @@
 export type ErrorCode =
   | 'auth/sessionInvalid'
   | 'auth/sessionExpired'
-  | 'auth/notAuthorized'
-  | 'login/failed'
-  | 'login/validation/username'
-  | 'login/validation/password'
-  | 'filebrowser/noEntry'
-  | 'filebrowser/notDirectory';
+  | 'unknown';
 
-class ErrorWithCode extends Error {
+class ApiError extends Error {
   code: ErrorCode;
 
   constructor({ code, message }: { code: ErrorCode; message?: string }) {
@@ -22,4 +17,4 @@ class ErrorWithCode extends Error {
   }
 }
 
-export { ErrorWithCode };
+export { ApiError };

@@ -8,6 +8,8 @@ const httpStatusCodeMap: Record<ErrorCode, number> = {
   'login/validation/username': 400,
   'login/validation/password': 400,
   'login/failed': 400,
+  'filebrowser/noEntry': 400,
+  'filebrowser/notDirectory': 400,
 };
 
 export const jsonErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
