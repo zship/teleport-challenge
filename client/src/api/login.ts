@@ -1,14 +1,7 @@
-import { ErrorWithCode } from 'client/lib/ErrorWithCode';
 import { makeRequest } from './makeRequest';
 
 type LoginResponse = {
   sessionId: string;
-};
-
-const isLoginResponse = (
-  obj: Record<string, unknown>,
-): obj is LoginResponse => {
-  return typeof obj.sessionId === 'string';
 };
 
 export const login = async ({
@@ -29,12 +22,5 @@ export const login = async ({
     body,
   });
 
-  if (!isLoginResponse(response)) {
-    throw new ErrorWithCode({
-      code: 'api/unexpectedResponse',
-      message: 'Something unexpected went wrong. Please try again later.',
-    });
-  }
-
-  return response;
+  return response as LoginResponse;
 };

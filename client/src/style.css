@@ -1,3 +1,13 @@
+html,
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+strong {
+  font-weight: 600;
+}
+
 .App {
   display: flex;
   flex-direction: column;
@@ -28,4 +38,87 @@
 
 .Login ul.server-error {
   color: red;
+}
+
+.Breadcrumbs {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.Breadcrumbs .pathPart,
+.Breadcrumbs .pathSeparator {
+  display: inline-block;
+  padding-right: 10px;
+}
+
+.FileBrowserSearch {
+  margin-bottom: 20px;
+}
+
+.DataGrid {
+  border: 1px solid rgb(208, 215, 222);
+}
+
+.DataGrid tbody td {
+  position: relative;
+  padding: 8px;
+}
+
+.DataGrid tbody td:first-child {
+  padding-left: 31px;
+}
+
+.directoryIcon {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+}
+
+.fileIcon {
+  position: absolute;
+  top: 8px;
+  left: 7px;
+}
+
+.DataGrid thead {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.DataGrid thead td {
+  height: 40px;
+}
+
+.DataGrid thead button {
+  border: 0 none;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  padding: 8px;
+}
+
+.DataGrid thead button:hover {
+  background: rgba(0, 0, 0, 0.11);
+}
+
+.DataGrid thead button:active {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.DataGrid thead .columnTitle,
+.DataGrid thead .sortIndicator {
+  display: inline-block;
+}
+
+.DataGrid thead .sortIndicator {
+  width: 20px;
+  margin-left: 10px;
+}
+
+.DataGrid tr {
+  border-bottom: 1px solid rgb(208, 215, 222);
+}
+
+.DataGrid tr:hover {
+  background: rgb(246, 248, 250);
 }
